@@ -130,9 +130,10 @@ data-engineering-pipeline/
 
 ## Learn more
 
-- Course page: [learnwithparam.com/courses/data-engineering-pipeline](https://www.learnwithparam.com/courses/data-engineering-pipeline)
+- Start the course: [learnwithparam.com/courses/data-engineering-pipeline](https://www.learnwithparam.com/courses/data-engineering-pipeline)
 - Data Engineering Bootcamp: [learnwithparam.com/data-engineering-bootcamp](https://www.learnwithparam.com/data-engineering-bootcamp)
 - All courses: [learnwithparam.com/courses](https://www.learnwithparam.com/courses)
+
 
 ## License
 
