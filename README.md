@@ -1,4 +1,4 @@
-# Data Engineering Pipeline
+# Production data pipelines with Airflow, Spark, and FastAPI
 
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -10,11 +10,22 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![learnwithparam](https://img.shields.io/badge/learnwithparam.com-0a0a0a?logo=readthedocs&logoColor=white)](https://www.learnwithparam.com)
 
-Intermediate data engineering workshop. A slimmed, teachable data platform: Airflow orchestrates batch ingestion, Spark does the heavy lifting, PostgreSQL is the warehouse, MinIO is the lake, Great Expectations validates quality, and a Python FastAPI backend is the control plane.
+Intermediate data engineering workshop. Build a teachable platform that schedules batch ingestion with Airflow, transforms data with Spark, validates quality with Great Expectations, lands a star schema in PostgreSQL, and exposes the whole stack through a FastAPI control plane.
 
-Originally sampled from a .NET-8 reference architecture; the backend has been ported 1:1 (in spirit) to Python so the entire platform is a single language + toolchain.
+This is the middle tier of the [learnwithparam.com](https://www.learnwithparam.com) data engineering track. It sits between [`data-engineering-medallion`](../data-engineering-medallion) (notebook-first foundations) and [`end-to-end-data-pipeline`](../end-to-end-data-pipeline) (enterprise-scale platform).
 
-This is the middle tier of the [learnwithparam.com](https://www.learnwithparam.com) data engineering track. Between [`data-engineering-medallion`](../data-engineering-medallion) (notebook-first) and [`end-to-end-data-pipeline`](../end-to-end-data-pipeline) (full production stack).
+Start the course: [learnwithparam.com/courses/data-engineering-pipeline](https://www.learnwithparam.com/courses/data-engineering-pipeline)
+Join the full path: [learnwithparam.com/data-engineering-bootcamp](https://www.learnwithparam.com/data-engineering-bootcamp)
+
+## What you'll build
+
+By the end of this project you will have:
+
+- An **Airflow DAG** that ingests source data on a schedule instead of waiting for someone to rerun a notebook
+- A **Spark batch job** that reads lake data and loads a warehouse model into PostgreSQL
+- A **Great Expectations quality gate** that blocks bad data before dashboards update
+- A **FastAPI control plane** that reports health, triggers runs, and gives the team one place to operate the pipeline
+- A **docker-compose platform** you can run on a laptop before moving to cloud infrastructure
 
 ## Architecture
 
@@ -41,7 +52,7 @@ This is the middle tier of the [learnwithparam.com](https://www.learnwithparam.c
 ## Tech
 
 - **Python 3.11**, **uv** for env management
-- **FastAPI** + **Pydantic v2** + **pydantic-settings** (.NET Options → pydantic BaseSettings)
+- **FastAPI** + **Pydantic v2** + **pydantic-settings** for a typed control plane
 - **Airflow 2.7** with DAGs for batch ingestion, streaming monitoring, warehouse transform
 - **Spark 3.5** for batch processing (one job out of the box)
 - **PostgreSQL 15** as the warehouse (star schema SQL in `scripts/init_warehouse.sql`)
@@ -74,7 +85,7 @@ make down
 - `GET  /health`                                    → aggregate health of Postgres / MinIO / Airflow
 - `GET  /data-engineering-pipeline/health`          → same, prefixed form
 - `POST /data-engineering-pipeline/pipeline/trigger` → trigger the batch DAG
-- `POST /data-engineering-pipeline/batch`           → compatible with the original .NET `BatchController`
+- `POST /data-engineering-pipeline/batch`           → batch ingestion entrypoint
 - `GET  /data-engineering-pipeline/datasets`        → list tables in the warehouse
 
 All endpoints gracefully degrade when the compose stack isn't running — `/health` reports `unavailable` per check and returns 200, and the trigger endpoint stubs the run when Airflow is unreachable.
@@ -84,18 +95,18 @@ All endpoints gracefully degrade when the compose stack isn't running — `/heal
 ```
 data-engineering-pipeline/
 ├── main.py                  FastAPI app
-├── router.py                Routes (ported from Controllers/*.cs)
-├── service.py               PipelineService (ported from BatchService/DbService)
-├── models.py                Pydantic models (ported from Models/*.cs)
+├── router.py                API routes
+├── service.py               Pipeline orchestration and health logic
+├── models.py                Request and response models
 ├── config/
-│   ├── database_options.py  ← DatabaseOptions.cs
-│   ├── airflow_options.py   ← AirflowOptions.cs
-│   ├── minio_options.py     ← MinioOptions.cs
-│   └── ge_options.py        ← GEOptions.cs
+│   ├── database_options.py  database configuration
+│   ├── airflow_options.py   Airflow configuration
+│   ├── minio_options.py     MinIO configuration
+│   └── ge_options.py        Great Expectations configuration
 ├── healthchecks/
-│   ├── postgres.py          ← PostgresHealthCheck.cs
-│   ├── minio.py             ← MinioHealthCheck.cs
-│   └── airflow.py           ← AirflowHealthCheck.cs
+│   ├── postgres.py          PostgreSQL health check
+│   ├── minio.py             MinIO health check
+│   └── airflow.py           Airflow health check
 ├── airflow/                 DAGs, plugins, Airflow Dockerfile
 │   └── dags/
 │       ├── batch_ingestion_dag.py
@@ -119,7 +130,9 @@ data-engineering-pipeline/
 
 ## Learn more
 
-- Full course: [learnwithparam.com](https://www.learnwithparam.com)
+- Course page: [learnwithparam.com/courses/data-engineering-pipeline](https://www.learnwithparam.com/courses/data-engineering-pipeline)
+- Data Engineering Bootcamp: [learnwithparam.com/data-engineering-bootcamp](https://www.learnwithparam.com/data-engineering-bootcamp)
+- All courses: [learnwithparam.com/courses](https://www.learnwithparam.com/courses)
 
 ## License
 
